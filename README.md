@@ -89,7 +89,7 @@ product.root_category_id - чтобы ускорить поиск категор
 ## Запуск проекта
 #### 1. Клонирование репозитория
 ```
-git clone <repo_url>
+git clone https://github.com/Dopelen/Product_categories
 cd Product_categories
 ```
 
