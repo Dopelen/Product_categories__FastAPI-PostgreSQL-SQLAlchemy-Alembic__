@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "product-categories"
+version = "0.1.0"
+description = ""
+authors = ["Олег <oleg.ablov@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.118.0"
+uvicorn = {extras = ["standard"], version = "^0.37.0"}
+sqlalchemy = "^2.0.43"
+asyncpg = "^0.30.0"
+pydantic = "^2.11.10"
+psycopg2-binary = "^2.9.10"
+
+
+[tool.poetry.group.dev.dependencies]
+alembic = "^1.16.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
