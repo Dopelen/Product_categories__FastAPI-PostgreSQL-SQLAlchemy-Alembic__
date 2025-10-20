@@ -1,29 +1,19 @@
-# Используем официальный Python 3.11 slim
 FROM python:3.11-slim
 
-# Устанавливаем зависимости системы
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Рабочая директория
 WORKDIR /app
 
-# Копируем файлы Poetry
-COPY pyproject.toml poetry.lock ./
+# Копируем файлы зависимостей
+COPY pyproject.toml poetry.lock* ./
 
-# Устанавливаем Poetry и зависимости проекта
-RUN pip install --no-cache-dir poetry==1.7.1 \
+# Устанавливаем Poetry и зависимости (без виртуального окружения)
+RUN pip install --no-cache-dir poetry \
     && poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+    && poetry install --no-root --no-interaction --no-ansi
 
-# Копируем весь проект
-COPY . .
+# Копируем исходный код и миграции
+COPY app/ ./app
+COPY alembic/ ./alembic/
+COPY alembic.ini .
 
-# Порт приложения
-EXPOSE 8000
-
-# Команда запуска (только FastAPI, миграции вручную)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Команда запуска: применяем миграции и стартуем приложение
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

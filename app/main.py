@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas import AddItemRequest, AddItemResponse
-from app.database import get_session  # dependency that yields AsyncSession
+from app.database import get_session
 from app.crud import add_item_to_order
 from app.exceptions import NotFoundError, OutOfStockError
 
