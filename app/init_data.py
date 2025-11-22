@@ -1,19 +1,14 @@
-# app/db/init_data.py
 import asyncio
-from datetime import datetime, timedelta
-
+from sqlalchemy import delete
 from app.database import async_session
 from app.models import Client, Category, Product, Order, OrderItem
 
-# Запуск планируется вне FastAPI,
-# поэтому использую асинхронную сессию саму по себе без get_session генератора описанного в database
 async def init_data():
     async with async_session() as session:
-        # Очистка таблиц (на случай повторного запуска)
+        # Очистка таблиц
         for model in [OrderItem, Order, Product, Category, Client]:
-            await session.execute(f"DELETE FROM {model.__tablename__};")
+            await session.execute(delete(model))
 
-        # Клиенты
         clients = [
             Client(id=1, name="Client A", address="Main Street 1"),
             Client(id=2, name="Client B", address="Second Avenue 22"),
@@ -21,7 +16,6 @@ async def init_data():
         ]
         session.add_all(clients)
 
-        # Категории с вложенностью
         categories = [
             Category(id=1, name="Electronics", parent_id=None),
             Category(id=2, name="Smartphones", parent_id=1),
@@ -31,7 +25,6 @@ async def init_data():
         ]
         session.add_all(categories)
 
-        # Товары
         products = [
             Product(id=1, name="iPhone 15", category_id=2, qty=20, price=999.99, root_category_id=1),
             Product(id=2, name="MacBook Air", category_id=3, qty=15, price=1299.99, root_category_id=1),
@@ -44,21 +37,16 @@ async def init_data():
 
         await session.flush()  # чтобы гарантировать наличие ID
 
-        now = datetime.utcnow()
-        last_month = now - timedelta(days=30)
-
-        # Заказы
         orders = [
-            Order(id=1, client_id=1, created_at=last_month + timedelta(days=5)),
-            Order(id=2, client_id=1, created_at=now - timedelta(days=10)),
-            Order(id=3, client_id=2, created_at=now - timedelta(days=3)),
-            Order(id=4, client_id=3, created_at=now - timedelta(days=25)),
+            Order(id=1, client_id=1),
+            Order(id=2, client_id=1),
+            Order(id=3, client_id=2),
+            Order(id=4, client_id=3),
         ]
         session.add_all(orders)
 
         await session.flush()
 
-        # Позиции заказов
         order_items = [
             OrderItem(order_id=1, product_id=1, qty=2, unit_price=999.99),
             OrderItem(order_id=1, product_id=2, qty=1, unit_price=1299.99),
